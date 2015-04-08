@@ -32,8 +32,9 @@
             this.rootPath = new System.Windows.Forms.TextBox();
             this.newTag = new System.Windows.Forms.TextBox();
             this.Tag = new System.Windows.Forms.Button();
-            this.treeView = new TaggerNamespace.MultiSelectTreeview();
             this.tagContainer = new System.Windows.Forms.FlowLayoutPanel();
+            this.treeView = new TaggerNamespace.MultiSelectTreeview();
+            this.listBox1 = new System.Windows.Forms.ListBox();
             this.SuspendLayout();
             // 
             // rootPath
@@ -60,6 +61,16 @@
             this.Tag.UseVisualStyleBackColor = true;
             this.Tag.Click += new System.EventHandler(this.tag_Click);
             // 
+            // tagContainer
+            // 
+            this.tagContainer.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.tagContainer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.tagContainer.Location = new System.Drawing.Point(465, 113);
+            this.tagContainer.Name = "tagContainer";
+            this.tagContainer.Padding = new System.Windows.Forms.Padding(5);
+            this.tagContainer.Size = new System.Drawing.Size(238, 148);
+            this.tagContainer.TabIndex = 6;
+            // 
             // treeView
             // 
             this.treeView.Location = new System.Drawing.Point(13, 48);
@@ -67,19 +78,22 @@
             this.treeView.SelectedNodes = ((System.Collections.Generic.List<System.Windows.Forms.TreeNode>)(resources.GetObject("treeView.SelectedNodes")));
             this.treeView.Size = new System.Drawing.Size(434, 447);
             this.treeView.TabIndex = 5;
+            this.treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView_AfterSelect);
             // 
-            // tagContainer
+            // listBox1
             // 
-            this.tagContainer.Location = new System.Drawing.Point(465, 113);
-            this.tagContainer.Name = "tagContainer";
-            this.tagContainer.Size = new System.Drawing.Size(238, 148);
-            this.tagContainer.TabIndex = 6;
+            this.listBox1.FormattingEnabled = true;
+            this.listBox1.Location = new System.Drawing.Point(530, 308);
+            this.listBox1.Name = "listBox1";
+            this.listBox1.Size = new System.Drawing.Size(120, 95);
+            this.listBox1.TabIndex = 7;
             // 
             // Tagger
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(715, 601);
+            this.ClientSize = new System.Drawing.Size(715, 513);
+            this.Controls.Add(this.listBox1);
             this.Controls.Add(this.tagContainer);
             this.Controls.Add(this.treeView);
             this.Controls.Add(this.Tag);
@@ -93,6 +107,11 @@
 
         }
 
+        void treeView_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            throw new System.NotImplementedException();
+        }
+
         #endregion
 
         private System.Windows.Forms.TextBox rootPath;
@@ -100,6 +119,7 @@
         private System.Windows.Forms.Button Tag;
         private global::TaggerNamespace.MultiSelectTreeview treeView;
         private System.Windows.Forms.FlowLayoutPanel tagContainer;
+        private System.Windows.Forms.ListBox listBox1;
     }
 }
 

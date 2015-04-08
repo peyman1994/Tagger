@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using System.ComponentModel;
 
 namespace TaggerNamespace
 {
-	public class MultiSelectTreeview : TreeView
+	public class MultiSelectTreeview : TreeView, INotifyPropertyChanged
 	{
 
 		#region Selected Node(s) Properties
@@ -29,7 +30,7 @@ namespace TaggerNamespace
 				}
 			}
 		}
-
+        public event PropertyChangedEventHandler PropertyChanged;
 		// Note we use the new keyword to Hide the native treeview's SelectedNode property.
 		private TreeNode m_SelectedNode;
 		public new TreeNode SelectedNode

@@ -17,6 +17,7 @@ namespace TaggerNamespace
     public partial class Tagger : Form
     {
         private EntityContext context;
+        private List<TreeNode> SelectedNodes = new List<TreeNode>();
 
         public Tagger()
         {
@@ -26,10 +27,49 @@ namespace TaggerNamespace
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            //ListDirectory(@"C:\Users\Peyman\Documents\Visual Studio 2013\Projects\Tagger\TestFiles");
-            var items = context.Items.ToList();
-            //treeView.Nodes.Add(LoadTree(context.Items.Where(i => i.ParentId == null).SingleOrDefault()));
+            //ListDirectory(@"Z:\Tagger\TestFiles");
+            //var items = context.Items.ToList();
+            treeView.Nodes.Add(LoadTree(context.Items.Where(i => i.ParentId == null).SingleOrDefault()));
         }
+
+        private void tag_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(newTag.Text))
+            {
+                return;
+            }
+            string newTagText = newTag.Text.Trim();
+            newTag.Text = string.Empty;
+
+            var tag = context.Tags.Where(t => t.Name == newTagText).SingleOrDefault();
+            if (tag == null)
+            {
+                tag = new Tag()
+                {
+                    Name = newTagText
+                };
+                context.Tags.Add(tag);
+                context.SaveChanges();
+            }
+
+            foreach (var node in treeView.SelectedNodes)
+            {
+                int itemId = Int32.Parse(node.Name);
+                context.ItemTagMap.Add(new ItemTagMap()
+                {
+                    ItemId = itemId,
+                    TagId = tag.Id
+                });
+            }
+            context.SaveChanges();
+            DisplayTags();
+        }
+
+        private void treeView_AfterSelect(object sender, EventArgs e)
+        {
+            DisplayTags();
+        }
+
 
         public TreeNode LoadTree(Item item)
         {
@@ -39,12 +79,6 @@ namespace TaggerNamespace
             foreach (var child in children)
                 directoryNode.Nodes.Add(LoadTree(child));
             return directoryNode;
-        }
-
-        private void ListDirectory(string path)
-        {
-            var rootDirectoryInfo = new DirectoryInfo(path);
-            SaveFolder(rootDirectoryInfo, null);
         }
 
         private void SaveFolder(DirectoryInfo directoryInfo, int? parentId)
@@ -73,39 +107,35 @@ namespace TaggerNamespace
             context.SaveChanges();
         }
 
-        private void tag_Click(object sender, EventArgs e)
+        private void DisplayTags()
         {
-            if (string.IsNullOrEmpty(newTag.Text))
-            {
-                return;
-            }
-            string newTagText = newTag.Text.Trim();
-
-            var tag = context.Tags.Where(t => t.Name == newTagText).SingleOrDefault();
-            if (tag == null)
-            {
-                tag = new Tag()
-                {
-                    Name = newTagText
-                };
-                context.Tags.Add(tag);
-                context.SaveChanges();
-            }
-
-            foreach (var node in treeView.SelectedNodes)
+            var selectedNodes = treeView.SelectedNodes;
+            tagContainer.Controls.Clear();
+            foreach (var node in selectedNodes)
             {
                 int itemId = Int32.Parse(node.Name);
-                context.ItemTagMap.Add(new ItemTagMap()
-                {
-                    ItemId = itemId,
-                    TagId = tag.Id
-                });
+                var tags = context.Tags.Where(t => context.ItemTagMap.Where(m => m.ItemId == itemId).Select(m => m.TagId).Contains(t.Id)).ToList();
+                if (tags != null)
+                    foreach(var tag in tags)
+                        tagContainer.Controls.Add(GetTagLabel(tag));
             }
         }
 
-        private void treeView_SelectedNodesChanged(EventArgs e)
+        private Label GetTagLabel(Tag tag)
         {
-            
+            var tagLabel = new Label();
+            tagLabel.Text = tag.Name;
+            tagLabel.Name = tag.Id.ToString();
+            tagLabel.Padding = new Padding(3);
+            tagLabel.BackColor = Color.LightBlue;
+            tagLabel.BorderStyle = BorderStyle.Fixed3D;
+            tagLabel.AutoSize = true;
+            return tagLabel;
+        }
+
+        private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+
         }
     }
 }
