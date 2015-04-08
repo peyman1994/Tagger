@@ -17,7 +17,6 @@ namespace TaggerNamespace
     public partial class Tagger : Form
     {
         private EntityContext context;
-        private List<TreeNode> SelectedNodes = new List<TreeNode>();
 
         public Tagger()
         {
@@ -25,7 +24,8 @@ namespace TaggerNamespace
             InitializeComponent();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        #region Events
+        private void Main_Load(object sender, EventArgs e)
         {
             //SaveFolder(new DirectoryInfo(@"Z:\Tagger\TestFiles"), null);
             //var items = context.Items.ToList();
@@ -33,7 +33,7 @@ namespace TaggerNamespace
             newTag.Items.AddRange(context.Tags.ToArray());
         }
 
-        private void tag_Click(object sender, EventArgs e)
+        private void tagButton_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(newTag.Text)) return;
 
@@ -53,17 +53,9 @@ namespace TaggerNamespace
                 newTag.Items.Add(tag);
             }
 
-            foreach (var node in treeView.SelectedNodes)
-            {
-                int itemId = Int32.Parse(node.Name);
-                context.ItemTagMap.Add(new ItemTagMap()
-                {
-                    ItemId = itemId,
-                    TagId = tag.Id
-                });
-            }
-            context.SaveChanges();
+            TagSelected(tag);
             DisplayTags();
+            AddRecentTag(tag);
             newTag.Text = string.Empty;
         }
 
@@ -78,6 +70,21 @@ namespace TaggerNamespace
             OpenItem(itemId);
         }
 
+        private void recentTag_Click(object sender, MouseEventArgs e)
+        {
+            var label = (Label)sender;
+            var recentTag = new Tag()
+            {
+                Name = label.Text,
+                Id = Int32.Parse(label.Name)
+            };
+            TagSelected(recentTag);
+            AddRecentTag(recentTag);
+            DisplayTags();
+        }
+        #endregion
+
+        #region Helper Methods
         private void EmptyDatabase()
         {
             context.Database.ExecuteSqlCommand("DELETE FROM [ItemTagMaps]");
@@ -121,12 +128,59 @@ namespace TaggerNamespace
             context.SaveChanges();
         }
 
+        /// <summary>
+        /// Opens the item's path with its default application
+        /// </summary>
+        /// <param name="itemId"></param>
         private void OpenItem(int itemId)
         {
             var path = context.Items.Where(i => i.Id == itemId).Select(i => i.Path).SingleOrDefault();
             Process.Start(path);
         }
 
+        /// <summary>
+        /// Tags the selected nodes
+        /// </summary>
+        /// <param name="tag"></param>
+        private void TagSelected(Tag tag)
+        {
+            foreach (var node in treeView.SelectedNodes)
+            {
+                int itemId = Int32.Parse(node.Name);
+                context.ItemTagMap.Add(new ItemTagMap()
+                {
+                    ItemId = itemId,
+                    TagId = tag.Id
+                });
+            }
+            context.SaveChanges();
+        }
+
+        /// <summary>
+        /// Adds the tag to the recent tags list
+        /// </summary>
+        /// <param name="tag"></param>
+        private void AddRecentTag(Tag tag)
+        {
+            var label = GetRecentTagLabel(tag);
+            if (recentTags.Controls.Count == 0)
+            {
+                recentTags.Controls.Add(label);
+                return;
+            }
+            else if (recentTags.Controls[0].Name == label.Name)
+                return;
+
+            var tmp = recentTags.Controls.Cast<Control>().ToList();            
+            tmp.RemoveAll(x => x.Name == label.Name);
+            recentTags.Controls.Clear();
+            recentTags.Controls.Add(label);
+            recentTags.Controls.AddRange(tmp.ToArray());
+        }
+
+        /// <summary>
+        /// Displays the tags for the selected nodes
+        /// </summary>
         private void DisplayTags()
         {
             var selectedNodes = treeView.SelectedNodes;
@@ -134,13 +188,21 @@ namespace TaggerNamespace
             foreach (var node in selectedNodes)
             {
                 int itemId = Int32.Parse(node.Name);
-                var tags = context.Tags.Where(t => context.ItemTagMap.Where(m => m.ItemId == itemId).Select(m => m.TagId).Contains(t.Id)).ToList();
+                var tags = context.Tags.Where(t => 
+                    context.ItemTagMap.Where(m => m.ItemId == itemId).Select(m => m.TagId).Contains(t.Id))
+                    .OrderBy(x => x.Name).ToList();
+
                 if (tags != null)
                     foreach (var tag in tags)
                         tagContainer.Controls.Add(GetTagLabel(tag));
             }
         }
 
+        /// <summary>
+        /// Returns a label control for the given tag
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <returns></returns>
         private Label GetTagLabel(Tag tag)
         {
             var tagLabel = new Label();
@@ -150,7 +212,18 @@ namespace TaggerNamespace
             tagLabel.BackColor = Color.LightBlue;
             tagLabel.BorderStyle = BorderStyle.Fixed3D;
             tagLabel.AutoSize = true;
+            tagLabel.Font = new Font(FontFamily.GenericSansSerif, 10);
+            tagLabel.Margin = new Padding(3);
+            tagLabel.Cursor = tagButton.Cursor;
             return tagLabel;
         }
+
+        private Label GetRecentTagLabel(Tag tag)
+        {
+            var recentTagLabel = GetTagLabel(tag);
+            recentTagLabel.MouseClick += new MouseEventHandler(recentTag_Click);
+            return recentTagLabel;
+        }
+        #endregion
     }
 }
