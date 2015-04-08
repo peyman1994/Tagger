@@ -30,26 +30,27 @@ namespace TaggerNamespace
             //ListDirectory(@"Z:\Tagger\TestFiles");
             //var items = context.Items.ToList();
             treeView.Nodes.Add(LoadTree(context.Items.Where(i => i.ParentId == null).SingleOrDefault()));
+            newTag.Items.AddRange(context.Tags.ToArray());
         }
 
         private void tag_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(newTag.Text))
-            {
-                return;
-            }
-            string newTagText = newTag.Text.Trim();
-            newTag.Text = string.Empty;
+            if (string.IsNullOrEmpty(newTag.Text)) return;
 
-            var tag = context.Tags.Where(t => t.Name == newTagText).SingleOrDefault();
-            if (tag == null)
+            Tag tag;
+            if (newTag.SelectedItem != null)
+            {
+                tag = (Tag)newTag.SelectedItem;
+            }
+            else
             {
                 tag = new Tag()
                 {
-                    Name = newTagText
+                    Name = newTag.Text.Trim()
                 };
                 context.Tags.Add(tag);
                 context.SaveChanges();
+                newTag.Items.Add(tag);
             }
 
             foreach (var node in treeView.SelectedNodes)
@@ -63,13 +64,13 @@ namespace TaggerNamespace
             }
             context.SaveChanges();
             DisplayTags();
+            newTag.Text = string.Empty;
         }
 
-        private void treeView_AfterSelect(object sender, EventArgs e)
+        private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
             DisplayTags();
         }
-
 
         public TreeNode LoadTree(Item item)
         {
@@ -116,7 +117,7 @@ namespace TaggerNamespace
                 int itemId = Int32.Parse(node.Name);
                 var tags = context.Tags.Where(t => context.ItemTagMap.Where(m => m.ItemId == itemId).Select(m => m.TagId).Contains(t.Id)).ToList();
                 if (tags != null)
-                    foreach(var tag in tags)
+                    foreach (var tag in tags)
                         tagContainer.Controls.Add(GetTagLabel(tag));
             }
         }
@@ -131,11 +132,6 @@ namespace TaggerNamespace
             tagLabel.BorderStyle = BorderStyle.Fixed3D;
             tagLabel.AutoSize = true;
             return tagLabel;
-        }
-
-        private void treeView_AfterSelect(object sender, TreeViewEventArgs e)
-        {
-
         }
     }
 }
