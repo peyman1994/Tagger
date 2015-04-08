@@ -83,6 +83,7 @@
             this.treeView.Size = new System.Drawing.Size(434, 447);
             this.treeView.TabIndex = 5;
             this.treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView_AfterSelect);
+            this.treeView.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView_DoubleClick);
             // 
             // Tagger
             // 

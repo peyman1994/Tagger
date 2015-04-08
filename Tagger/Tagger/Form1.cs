@@ -4,13 +4,13 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using TaggerNamespace.DAL;
 using TaggerNamespace.Model;
 using System.Data.Entity;
+using System.Diagnostics;
 
 namespace TaggerNamespace
 {
@@ -27,7 +27,7 @@ namespace TaggerNamespace
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            //ListDirectory(@"Z:\Tagger\TestFiles");
+            //SaveFolder(new DirectoryInfo(@"Z:\Tagger\TestFiles"), null);
             //var items = context.Items.ToList();
             treeView.Nodes.Add(LoadTree(context.Items.Where(i => i.ParentId == null).SingleOrDefault()));
             newTag.Items.AddRange(context.Tags.ToArray());
@@ -72,6 +72,19 @@ namespace TaggerNamespace
             DisplayTags();
         }
 
+        private void treeView_DoubleClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            var itemId = Int32.Parse(e.Node.Name);
+            OpenItem(itemId);
+        }
+
+        private void EmptyDatabase()
+        {
+            context.Database.ExecuteSqlCommand("DELETE FROM [ItemTagMaps]");
+            context.Database.ExecuteSqlCommand("DELETE FROM [Items]");
+            context.Database.ExecuteSqlCommand("DELETE FROM [Tags]");
+        }
+
         public TreeNode LoadTree(Item item)
         {
             var children = context.Items.Where(i => i.ParentId == item.Id).ToList();
@@ -87,7 +100,7 @@ namespace TaggerNamespace
             var folder = new Item()
             {
                 Name = directoryInfo.Name,
-                Path = directoryInfo.ToString(),
+                Path = directoryInfo.FullName,
                 ParentId = parentId,
                 IsFolder = true
             };
@@ -101,11 +114,17 @@ namespace TaggerNamespace
                 {
                     IsFolder = false,
                     Name = file.Name,
-                    Path = file.ToString(),
+                    Path = file.FullName,
                     ParentId = folder.Id
                 });
             }
             context.SaveChanges();
+        }
+
+        private void OpenItem(int itemId)
+        {
+            var path = context.Items.Where(i => i.Id == itemId).Select(i => i.Path).SingleOrDefault();
+            Process.Start(path);
         }
 
         private void DisplayTags()
