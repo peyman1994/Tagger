@@ -30,7 +30,7 @@ namespace TaggerNamespace
         private void Main_Load(object sender, EventArgs e)
         {
             //SaveFolder(new DirectoryInfo(@"Z:\Tagger\TestFiles"), null);
-            //var items = context.Items.ToList();
+
             treeView.Nodes.Add(LoadTree(context.Items.Where(i => i.ParentId == null).SingleOrDefault()));
             newTag.Items.AddRange(Tags);
             tagSelector.Items.AddRange(Tags);            
@@ -95,7 +95,12 @@ namespace TaggerNamespace
 
         private void searchButton_Click(object sender, EventArgs e)
         {
+            //context.Items.Where(x => x.Tags.)
+        }
 
+        private void appendTag_Click(object sender, EventArgs e)
+        {
+            searchQuery.Text += tagSelector.Text;
         }
         #endregion
 
@@ -162,11 +167,12 @@ namespace TaggerNamespace
             foreach (var node in treeView.SelectedNodes)
             {
                 int itemId = Int32.Parse(node.Name);
-                context.ItemTagMap.Add(new ItemTagMap()
+                var item = context.Items.Where(x => x.Id == itemId).SingleOrDefault();
+                if (item != null)
                 {
-                    ItemId = itemId,
-                    TagId = tag.Id
-                });
+                    item.Tags.Add(tag);
+                    context.Items.Attach(item);
+                }
             }
             context.SaveChanges();
         }
@@ -203,9 +209,7 @@ namespace TaggerNamespace
             foreach (var node in selectedNodes)
             {
                 int itemId = Int32.Parse(node.Name);
-                var tags = context.Tags.Where(t => 
-                    context.ItemTagMap.Where(m => m.ItemId == itemId).Select(m => m.TagId).Contains(t.Id))
-                    .OrderBy(x => x.Name).ToList();
+                var tags = context.Items.Where(x => x.Id == itemId).SingleOrDefault().Tags;
 
                 if (tags != null)
                     foreach (var tag in tags)

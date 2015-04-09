@@ -17,8 +17,8 @@ namespace TaggerNamespace.Model
         public String Name { get; set; }
         public int? ParentId { get; set; }
         public bool IsFolder { get; set; }
-        [NotMapped]
-        public List<Tag> Tags { get; set; }
+
+        public virtual IList<Tag> Tags { get; set; }
     }
 
     public class Tag
@@ -27,15 +27,6 @@ namespace TaggerNamespace.Model
         public int Id { get; set; }
         [Required]
         public String Name { get; set; }
-    }
-
-    public class ItemTagMap
-    {
-        [Key]
-        public int ItemTagId { get; set; }
-        [Required]
-        public int ItemId { get; set; }
-        [Required]
-        public int TagId { get; set; }
+        public virtual IList<Item> Items { get; set; }
     }
 }

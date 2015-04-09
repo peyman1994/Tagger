@@ -19,6 +19,18 @@ namespace TaggerNamespace.DAL
 
         public DbSet<Item> Items { get; set; }
         public DbSet<Tag> Tags { get; set; }
-        public DbSet<ItemTagMap> ItemTagMap { get; set; }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Item>()
+                .HasMany(x => x.Tags)
+                .WithMany(x => x.Items)
+                .Map(x => 
+                    {
+                        x.ToTable("ItemTagMaps");
+                        x.MapLeftKey("ItemId");
+                        x.MapRightKey("TagId");
+                    });               
+        }
     }
 }

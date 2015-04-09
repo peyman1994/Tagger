@@ -39,11 +39,11 @@
             this.tagTab = new System.Windows.Forms.TabPage();
             this.treeView = new TaggerNamespace.MultiSelectTreeview();
             this.searchTab = new System.Windows.Forms.TabPage();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.appendTag = new System.Windows.Forms.Button();
+            this.searchQuery = new System.Windows.Forms.TextBox();
             this.tagSelector = new System.Windows.Forms.ComboBox();
             this.searchResults = new System.Windows.Forms.ListView();
             this.searchButton = new System.Windows.Forms.Button();
-            this.appendTag = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tagTab.SuspendLayout();
             this.searchTab.SuspendLayout();
@@ -152,7 +152,7 @@
             // 
             this.searchTab.BackColor = System.Drawing.SystemColors.Control;
             this.searchTab.Controls.Add(this.appendTag);
-            this.searchTab.Controls.Add(this.textBox1);
+            this.searchTab.Controls.Add(this.searchQuery);
             this.searchTab.Controls.Add(this.tagSelector);
             this.searchTab.Controls.Add(this.searchResults);
             this.searchTab.Controls.Add(this.searchButton);
@@ -163,12 +163,22 @@
             this.searchTab.TabIndex = 1;
             this.searchTab.Text = "Search";
             // 
-            // textBox1
+            // appendTag
             // 
-            this.textBox1.Location = new System.Drawing.Point(166, 7);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(432, 20);
-            this.textBox1.TabIndex = 4;
+            this.appendTag.Location = new System.Drawing.Point(133, 7);
+            this.appendTag.Name = "appendTag";
+            this.appendTag.Size = new System.Drawing.Size(27, 20);
+            this.appendTag.TabIndex = 5;
+            this.appendTag.Text = "=>";
+            this.appendTag.UseVisualStyleBackColor = true;
+            this.appendTag.Click += new System.EventHandler(this.appendTag_Click);
+            // 
+            // searchQuery
+            // 
+            this.searchQuery.Location = new System.Drawing.Point(166, 7);
+            this.searchQuery.Name = "searchQuery";
+            this.searchQuery.Size = new System.Drawing.Size(432, 20);
+            this.searchQuery.TabIndex = 4;
             // 
             // tagSelector
             // 
@@ -203,15 +213,6 @@
             this.searchButton.Text = "Search";
             this.searchButton.UseVisualStyleBackColor = true;
             this.searchButton.Click += new System.EventHandler(this.searchButton_Click);
-            // 
-            // appendTag
-            // 
-            this.appendTag.Location = new System.Drawing.Point(133, 7);
-            this.appendTag.Name = "appendTag";
-            this.appendTag.Size = new System.Drawing.Size(27, 20);
-            this.appendTag.TabIndex = 5;
-            this.appendTag.Text = "=>";
-            this.appendTag.UseVisualStyleBackColor = true;
             // 
             // Tagger
             // 
@@ -251,7 +252,7 @@
         private System.Windows.Forms.Button searchButton;
         private System.Windows.Forms.ListView searchResults;
         private System.Windows.Forms.ComboBox tagSelector;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox searchQuery;
         private System.Windows.Forms.Button appendTag;
     }
 }
