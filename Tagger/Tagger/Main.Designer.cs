@@ -191,6 +191,7 @@
             this.tagSelector.Size = new System.Drawing.Size(121, 21);
             this.tagSelector.TabIndex = 3;
             this.tagSelector.ValueMember = "Id";
+            this.tagSelector.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tagSelector_KeyDown);
             // 
             // searchResults
             // 
@@ -203,6 +204,9 @@
             this.searchResults.TabIndex = 2;
             this.searchResults.UseCompatibleStateImageBehavior = false;
             this.searchResults.View = System.Windows.Forms.View.Details;
+            this.searchResults.Columns.Add("Name", 125);
+            this.searchResults.Columns.Add("Path", 300);
+            this.searchResults.DoubleClick += new System.EventHandler(this.searchResults_DoubleClick);
             // 
             // searchButton
             // 

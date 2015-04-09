@@ -17,12 +17,10 @@ namespace TaggerNamespace
     public partial class Tagger : Form
     {
         private EntityContext context;
-        private Tag[] Tags;
 
         public Tagger()
         {
             context = new EntityContext();
-            Tags = context.Tags.ToArray();
             InitializeComponent();
         }
 
@@ -32,9 +30,9 @@ namespace TaggerNamespace
             //SaveFolder(new DirectoryInfo(@"Z:\Tagger\TestFiles"), null);
 
             treeView.Nodes.Add(LoadTree(context.Items.Where(i => i.ParentId == null).SingleOrDefault()));
-            newTag.Items.AddRange(Tags);
-            tagSelector.Items.AddRange(Tags);            
-            DisplaySearchResults(context.Items.ToList());            
+            var tags = context.Tags.ToArray();
+            newTag.Items.AddRange(tags);
+            tagSelector.Items.AddRange(tags);
         }
 
         private void tagButton_Click(object sender, EventArgs e)
@@ -62,7 +60,6 @@ namespace TaggerNamespace
             AddRecentTag(tag);
             newTag.Text = string.Empty;
         }
-
         private void newTag_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -80,6 +77,16 @@ namespace TaggerNamespace
             OpenItem(itemId);
         }
 
+        private void searchResults_DoubleClick(object sender, EventArgs e)
+        {
+            var items = searchResults.SelectedItems;
+            foreach (var item in items)
+            {
+                var path = ((ListViewItem)item).SubItems[1].Text;
+                Process.Start(path);
+            }
+        }
+
         private void recentTag_Click(object sender, MouseEventArgs e)
         {
             var label = (Label)sender;
@@ -95,12 +102,18 @@ namespace TaggerNamespace
 
         private void searchButton_Click(object sender, EventArgs e)
         {
-            //context.Items.Where(x => x.Tags.)
+            var query = searchQuery.Text.Trim();
+            DisplaySearchResults(context.Items.Where(i => i.Tags.Any(t => t.Name == query)).ToList());
         }
 
         private void appendTag_Click(object sender, EventArgs e)
         {
             searchQuery.Text += tagSelector.Text;
+        }
+        private void tagSelector_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+                appendTag_Click(sender, e);
         }
         #endregion
 
@@ -192,7 +205,7 @@ namespace TaggerNamespace
             else if (recentTags.Controls[0].Name == label.Name)
                 return;
 
-            var tmp = recentTags.Controls.Cast<Control>().ToList();            
+            var tmp = recentTags.Controls.Cast<Control>().ToList();
             tmp.RemoveAll(x => x.Name == label.Name);
             recentTags.Controls.Clear();
             recentTags.Controls.Add(label);
@@ -206,20 +219,25 @@ namespace TaggerNamespace
         {
             var selectedNodes = treeView.SelectedNodes;
             tagContainer.Controls.Clear();
+            IList<Tag> tags = new List<Tag>();
             foreach (var node in selectedNodes)
             {
                 int itemId = Int32.Parse(node.Name);
-                var tags = context.Items.Where(x => x.Id == itemId).SingleOrDefault().Tags;
-
-                if (tags != null)
-                    foreach (var tag in tags)
-                        tagContainer.Controls.Add(GetTagLabel(tag));
+                var itemTags = context.Items.Where(x => x.Id == itemId).SingleOrDefault().Tags;
+                if (!tags.Any())
+                    tags = itemTags;
+                else
+                    tags = tags.Intersect(itemTags).ToList();
             }
+            if (tags != null)
+                foreach (var tag in tags)
+                    tagContainer.Controls.Add(GetTagLabel(tag));
+
         }
 
         private void DisplaySearchResults(List<Item> items)
         {
-            foreach(var item in items)
+            foreach (var item in items)
             {
                 ListViewItem listItem = new ListViewItem(item.Name);
                 listItem.SubItems.Add(item.Path);
