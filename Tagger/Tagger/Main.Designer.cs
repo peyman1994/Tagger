@@ -37,10 +37,16 @@
             this.tagContainerLabel = new System.Windows.Forms.Label();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tagTab = new System.Windows.Forms.TabPage();
-            this.searchTab = new System.Windows.Forms.TabPage();
             this.treeView = new TaggerNamespace.MultiSelectTreeview();
+            this.searchTab = new System.Windows.Forms.TabPage();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.tagSelector = new System.Windows.Forms.ComboBox();
+            this.searchResults = new System.Windows.Forms.ListView();
+            this.searchButton = new System.Windows.Forms.Button();
+            this.appendTag = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tagTab.SuspendLayout();
+            this.searchTab.SuspendLayout();
             this.SuspendLayout();
             // 
             // tagButton
@@ -48,7 +54,7 @@
             this.tagButton.Cursor = System.Windows.Forms.Cursors.Hand;
             this.tagButton.Location = new System.Drawing.Point(640, 11);
             this.tagButton.Name = "tagButton";
-            this.tagButton.Size = new System.Drawing.Size(36, 23);
+            this.tagButton.Size = new System.Drawing.Size(36, 21);
             this.tagButton.TabIndex = 4;
             this.tagButton.Text = "Tag";
             this.tagButton.UseVisualStyleBackColor = true;
@@ -75,6 +81,7 @@
             this.newTag.Size = new System.Drawing.Size(196, 21);
             this.newTag.TabIndex = 7;
             this.newTag.ValueMember = "Id";
+            this.newTag.KeyDown += new System.Windows.Forms.KeyEventHandler(this.newTag_KeyDown);
             // 
             // recentTags
             // 
@@ -131,16 +138,6 @@
             this.tagTab.TabIndex = 0;
             this.tagTab.Text = "Tag";
             // 
-            // searchTab
-            // 
-            this.searchTab.Location = new System.Drawing.Point(4, 22);
-            this.searchTab.Name = "searchTab";
-            this.searchTab.Padding = new System.Windows.Forms.Padding(3);
-            this.searchTab.Size = new System.Drawing.Size(682, 462);
-            this.searchTab.TabIndex = 1;
-            this.searchTab.Text = "Search";
-            this.searchTab.UseVisualStyleBackColor = true;
-            // 
             // treeView
             // 
             this.treeView.Location = new System.Drawing.Point(6, 6);
@@ -150,6 +147,71 @@
             this.treeView.TabIndex = 5;
             this.treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView_AfterSelect);
             this.treeView.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView_DoubleClick);
+            // 
+            // searchTab
+            // 
+            this.searchTab.BackColor = System.Drawing.SystemColors.Control;
+            this.searchTab.Controls.Add(this.appendTag);
+            this.searchTab.Controls.Add(this.textBox1);
+            this.searchTab.Controls.Add(this.tagSelector);
+            this.searchTab.Controls.Add(this.searchResults);
+            this.searchTab.Controls.Add(this.searchButton);
+            this.searchTab.Location = new System.Drawing.Point(4, 22);
+            this.searchTab.Name = "searchTab";
+            this.searchTab.Padding = new System.Windows.Forms.Padding(3);
+            this.searchTab.Size = new System.Drawing.Size(682, 462);
+            this.searchTab.TabIndex = 1;
+            this.searchTab.Text = "Search";
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(166, 7);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(432, 20);
+            this.textBox1.TabIndex = 4;
+            // 
+            // tagSelector
+            // 
+            this.tagSelector.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
+            this.tagSelector.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.tagSelector.DisplayMember = "Name";
+            this.tagSelector.FormattingEnabled = true;
+            this.tagSelector.Location = new System.Drawing.Point(6, 7);
+            this.tagSelector.Name = "tagSelector";
+            this.tagSelector.Size = new System.Drawing.Size(121, 21);
+            this.tagSelector.TabIndex = 3;
+            this.tagSelector.ValueMember = "Id";
+            // 
+            // searchResults
+            // 
+            this.searchResults.AllowColumnReorder = true;
+            this.searchResults.FullRowSelect = true;
+            this.searchResults.Location = new System.Drawing.Point(6, 42);
+            this.searchResults.Name = "searchResults";
+            this.searchResults.Size = new System.Drawing.Size(659, 184);
+            this.searchResults.Sorting = System.Windows.Forms.SortOrder.Ascending;
+            this.searchResults.TabIndex = 2;
+            this.searchResults.UseCompatibleStateImageBehavior = false;
+            this.searchResults.View = System.Windows.Forms.View.Details;
+            // 
+            // searchButton
+            // 
+            this.searchButton.Location = new System.Drawing.Point(604, 7);
+            this.searchButton.Name = "searchButton";
+            this.searchButton.Size = new System.Drawing.Size(61, 21);
+            this.searchButton.TabIndex = 1;
+            this.searchButton.Text = "Search";
+            this.searchButton.UseVisualStyleBackColor = true;
+            this.searchButton.Click += new System.EventHandler(this.searchButton_Click);
+            // 
+            // appendTag
+            // 
+            this.appendTag.Location = new System.Drawing.Point(133, 7);
+            this.appendTag.Name = "appendTag";
+            this.appendTag.Size = new System.Drawing.Size(27, 20);
+            this.appendTag.TabIndex = 5;
+            this.appendTag.Text = "=>";
+            this.appendTag.UseVisualStyleBackColor = true;
             // 
             // Tagger
             // 
@@ -163,6 +225,8 @@
             this.tabControl1.ResumeLayout(false);
             this.tagTab.ResumeLayout(false);
             this.tagTab.PerformLayout();
+            this.searchTab.ResumeLayout(false);
+            this.searchTab.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -184,6 +248,11 @@
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tagTab;
         private System.Windows.Forms.TabPage searchTab;
+        private System.Windows.Forms.Button searchButton;
+        private System.Windows.Forms.ListView searchResults;
+        private System.Windows.Forms.ComboBox tagSelector;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Button appendTag;
     }
 }
 
