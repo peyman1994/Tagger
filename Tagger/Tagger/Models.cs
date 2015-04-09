@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TaggerNamespace.Model
 {
@@ -15,7 +16,9 @@ namespace TaggerNamespace.Model
         public String Path { get; set; }
         public String Name { get; set; }
         public int? ParentId { get; set; }
-        public bool IsFolder { get; set; }        
+        public bool IsFolder { get; set; }
+        [NotMapped]
+        public List<Tag> Tags { get; set; }
     }
 
     public class Tag
