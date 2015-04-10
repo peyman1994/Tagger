@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
@@ -27,7 +28,8 @@ namespace TaggerNamespace
         #region Events
         private void Main_Load(object sender, EventArgs e)
         {
-            //SaveFolder(new DirectoryInfo(@"Z:\Tagger\TestFiles"), null);
+            //EmptyDatabase();
+            //SaveFolder(new DirectoryInfo(@"C:\Users\Peyman\Documents\Git\TestFiles"), null);
 
             treeView.Nodes.Add(LoadTree(context.Items.Where(i => i.ParentId == null).SingleOrDefault()));
             var tags = context.Tags.ToArray();
@@ -89,12 +91,8 @@ namespace TaggerNamespace
 
         private void recentTag_Click(object sender, MouseEventArgs e)
         {
-            var label = (Label)sender;
-            var recentTag = new Tag()
-            {
-                Name = label.Text,
-                Id = Int32.Parse(label.Name)
-            };
+            var tagId = Int32.Parse(((Label)sender).Name);
+            var recentTag = context.Tags.Where(t => t.Id == tagId).SingleOrDefault();
             TagSelected(recentTag);
             AddRecentTag(recentTag);
             DisplayTags();
@@ -103,7 +101,34 @@ namespace TaggerNamespace
         private void searchButton_Click(object sender, EventArgs e)
         {
             var query = searchQuery.Text.Trim();
-            DisplaySearchResults(context.Items.Where(i => i.Tags.Any(t => t.Name == query)).ToList());
+            //Expression<Func<Tag, bool>> test;// = new Expression.Lambda<Func<Model.Tag, bool>>();
+            
+            //LambdaExpression expression = Expression.Lambda<Func<Tag, bool>>;
+            var peItem = Expression.Parameter(typeof(Item), "item");
+            var itemTags = Expression.Property(peItem, "Tags");
+            var peTag = Expression.Parameter(typeof(Tag), "tag");
+            var exp = GetNameExp(peTag, query);
+            var any = Expression.Call(itemTags, typeof(IEnumerable<Tag>).GetMethod("Any"), new Expression[] { exp });
+            var lambda = Expression.Lambda<Func<Item, bool>>(exp, new ParameterExpression[] { peItem });
+            //var func = lambda.Compile();
+            //Func<Tag, bool> func = expression.Compile();
+            DisplaySearchResults(context.Items.Where(lambda).ToList());
+        }
+
+        private Expression GetNameExp(ParameterExpression pe, string name)
+        {
+            Expression left = Expression.Property(pe, "Name");
+
+            if (name[0] == '!')
+            {
+                Expression right = Expression.Constant(name.Substring(1));
+                return Expression.NotEqual(left, right);
+            }
+            else
+            {
+                Expression right = Expression.Constant(name);
+                return Expression.Equal(left, right);
+            }
         }
 
         private void appendTag_Click(object sender, EventArgs e)
@@ -118,6 +143,8 @@ namespace TaggerNamespace
         #endregion
 
         #region Helper Methods
+
+
         private void EmptyDatabase()
         {
             context.Database.ExecuteSqlCommand("DELETE FROM [ItemTagMaps]");
@@ -219,13 +246,13 @@ namespace TaggerNamespace
         {
             var selectedNodes = treeView.SelectedNodes;
             tagContainer.Controls.Clear();
-            IList<Tag> tags = new List<Tag>();
+            List<Tag> tags = null;
             foreach (var node in selectedNodes)
             {
                 int itemId = Int32.Parse(node.Name);
                 var itemTags = context.Items.Where(x => x.Id == itemId).SingleOrDefault().Tags;
-                if (!tags.Any())
-                    tags = itemTags;
+                if (tags == null)
+                    tags = (List<Tag>)itemTags;
                 else
                     tags = tags.Intersect(itemTags).ToList();
             }
