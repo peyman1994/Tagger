@@ -102,59 +102,9 @@ namespace TaggerNamespace
         private void searchButton_Click(object sender, EventArgs e)
         {
             var query = searchQuery.Text.Trim();
+            var lambda = ExpressionBuilder.BuildExpression(query);
 
-            var peItem = Expression.Parameter(typeof(Item), "i");
-            var peTags = Expression.Property(peItem, "Tags");
-            var peTag = Expression.Parameter(typeof(Tag), "t");
-            var expLambda = Expression.Lambda<Func<Tag, bool>>(GetNameExp(peTag, query), peTag);
-            var any = CallAny(peTags, expLambda);
-            var lamb = Expression.Lambda<Func<Item, bool>>(any, peItem);
-
-            DisplaySearchResults(context.Items.Where(lamb).ToList());
-        }
-
-        private MethodBase GetGenericMethod(Type type, string name, Type[] typeArgs,
-    Type[] argTypes, BindingFlags flags)
-        {
-            int typeArity = typeArgs.Length;
-            var methods = type.GetMethods()
-                .Where(m => m.Name == name)
-                .Where(m => m.GetGenericArguments().Length == typeArity)
-                .Select(m => m.MakeGenericMethod(typeArgs));
-
-            return Type.DefaultBinder.SelectMethod(flags, methods.ToArray(), argTypes, null);
-        }
-
-        private Expression CallAny(Expression collection, Expression predicate)
-        {
-            Type elemType = typeof(IEnumerable<Tag>).GetGenericArguments()[0];
-            Type predType = typeof(Func<,>).MakeGenericType(elemType, typeof(bool));
-
-            // Enumerable.Any<T>(IEnumerable<T>, Func<T,bool>)
-            MethodInfo anyMethod = (MethodInfo)
-                GetGenericMethod(typeof(Enumerable), "Any", new[] { elemType },
-                    new[] { typeof(IEnumerable<Tag>), predType }, BindingFlags.Static);
-
-            return Expression.Call(
-                anyMethod,
-                    collection,
-                    predicate);
-        }
-
-        private Expression GetNameExp(ParameterExpression pe, string name)
-        {
-            Expression left = Expression.Property(pe, "Name");
-
-            if (name[0] == '!')
-            {
-                Expression right = Expression.Constant(name.Substring(1));
-                return Expression.NotEqual(left, right);
-            }
-            else
-            {
-                Expression right = Expression.Constant(name);
-                return Expression.Equal(left, right);
-            }
+            DisplaySearchResults(context.Items.Where(lambda).ToList());
         }
 
         private void appendTag_Click(object sender, EventArgs e)
@@ -290,6 +240,7 @@ namespace TaggerNamespace
 
         private void DisplaySearchResults(List<Item> items)
         {
+            searchResults.Items.Clear();
             foreach (var item in items)
             {
                 ListViewItem listItem = new ListViewItem(item.Name);

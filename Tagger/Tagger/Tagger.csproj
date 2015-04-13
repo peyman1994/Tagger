@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EntityContext.cs" />
+    <Compile Include="ExpressionBuilder.cs" />
     <Compile Include="Main.cs">
       <SubType>Form</SubType>
     </Compile>
