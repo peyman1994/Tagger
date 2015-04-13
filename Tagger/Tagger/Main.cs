@@ -12,6 +12,7 @@ using TaggerNamespace.DAL;
 using TaggerNamespace.Model;
 using System.Data.Entity;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace TaggerNamespace
 {
@@ -101,18 +102,43 @@ namespace TaggerNamespace
         private void searchButton_Click(object sender, EventArgs e)
         {
             var query = searchQuery.Text.Trim();
-            //Expression<Func<Tag, bool>> test;// = new Expression.Lambda<Func<Model.Tag, bool>>();
-            
-            //LambdaExpression expression = Expression.Lambda<Func<Tag, bool>>;
-            var peItem = Expression.Parameter(typeof(Item), "item");
-            var itemTags = Expression.Property(peItem, "Tags");
-            var peTag = Expression.Parameter(typeof(Tag), "tag");
-            var exp = GetNameExp(peTag, query);
-            var any = Expression.Call(itemTags, typeof(IEnumerable<Tag>).GetMethod("Any"), new Expression[] { exp });
-            var lambda = Expression.Lambda<Func<Item, bool>>(exp, new ParameterExpression[] { peItem });
-            //var func = lambda.Compile();
-            //Func<Tag, bool> func = expression.Compile();
-            DisplaySearchResults(context.Items.Where(lambda).ToList());
+
+            var peItem = Expression.Parameter(typeof(Item), "i");
+            var peTags = Expression.Property(peItem, "Tags");
+            var peTag = Expression.Parameter(typeof(Tag), "t");
+            var expLambda = Expression.Lambda<Func<Tag, bool>>(GetNameExp(peTag, query), peTag);
+            var any = CallAny(peTags, expLambda);
+            var lamb = Expression.Lambda<Func<Item, bool>>(any, peItem);
+
+            DisplaySearchResults(context.Items.Where(lamb).ToList());
+        }
+
+        private MethodBase GetGenericMethod(Type type, string name, Type[] typeArgs,
+    Type[] argTypes, BindingFlags flags)
+        {
+            int typeArity = typeArgs.Length;
+            var methods = type.GetMethods()
+                .Where(m => m.Name == name)
+                .Where(m => m.GetGenericArguments().Length == typeArity)
+                .Select(m => m.MakeGenericMethod(typeArgs));
+
+            return Type.DefaultBinder.SelectMethod(flags, methods.ToArray(), argTypes, null);
+        }
+
+        private Expression CallAny(Expression collection, Expression predicate)
+        {
+            Type elemType = typeof(IEnumerable<Tag>).GetGenericArguments()[0];
+            Type predType = typeof(Func<,>).MakeGenericType(elemType, typeof(bool));
+
+            // Enumerable.Any<T>(IEnumerable<T>, Func<T,bool>)
+            MethodInfo anyMethod = (MethodInfo)
+                GetGenericMethod(typeof(Enumerable), "Any", new[] { elemType },
+                    new[] { typeof(IEnumerable<Tag>), predType }, BindingFlags.Static);
+
+            return Expression.Call(
+                anyMethod,
+                    collection,
+                    predicate);
         }
 
         private Expression GetNameExp(ParameterExpression pe, string name)
@@ -268,8 +294,19 @@ namespace TaggerNamespace
             {
                 ListViewItem listItem = new ListViewItem(item.Name);
                 listItem.SubItems.Add(item.Path);
+                listItem.SubItems.Add(GetTagString(item));
                 searchResults.Items.Add(listItem);
             }
+        }
+
+        private string GetTagString(Item item)
+        {
+            string tagString = string.Empty;
+            foreach (var tag in item.Tags)
+            {
+                tagString += tag.Name + "; ";
+            }
+            return tagString;
         }
 
         /// <summary>
