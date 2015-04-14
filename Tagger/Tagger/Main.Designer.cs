@@ -179,6 +179,7 @@
             this.searchQuery.Name = "searchQuery";
             this.searchQuery.Size = new System.Drawing.Size(432, 20);
             this.searchQuery.TabIndex = 4;
+            this.searchQuery.KeyDown += new System.Windows.Forms.KeyEventHandler(this.searchQuery_KeyDown);
             // 
             // tagSelector
             // 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TaggerNamespace.Model;
 
@@ -17,9 +18,32 @@ namespace TaggerNamespace
 
         public static Expression<Func<Item, bool>> BuildExpression(string query)
         {
-            var nameExp = GetTagExp(query);
+            
+            Expression exp = null;
+            var orTerms = Regex.Split(query, " or ", RegexOptions.IgnoreCase);
+            foreach (var orTerm in orTerms)
+            {                
+                var andTerms = Regex.Split(orTerm, " and ", RegexOptions.IgnoreCase);
+                Expression andExp= null;
+                foreach(var andTerm in andTerms)
+                {
+                    string tag = andTerm.Trim();
+                    if (string.IsNullOrEmpty(tag) || tag.Contains(" "))
+                        throw new Exception();
 
-            var exp = Expression.And(CallMethod("Any", null), nameExp);
+                    if (andExp == null)
+                        andExp = GetTagExp(tag);
+                    else
+                        andExp = Expression.And(andExp, GetTagExp(tag));
+                }
+
+                if (exp == null)
+                    exp = andExp;
+                else
+                    exp = Expression.Or(exp, andExp);
+            }
+
+            exp = Expression.And(CallMethod("Any", null), exp);
             return Expression.Lambda<Func<Item, bool>>(exp, peItem);
         }
 

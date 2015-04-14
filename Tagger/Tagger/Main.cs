@@ -106,6 +106,11 @@ namespace TaggerNamespace
 
             DisplaySearchResults(context.Items.Where(lambda).ToList());
         }
+        private void searchQuery_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+                searchButton_Click(sender, e);
+        }
 
         private void appendTag_Click(object sender, EventArgs e)
         {
@@ -119,8 +124,6 @@ namespace TaggerNamespace
         #endregion
 
         #region Helper Methods
-
-
         private void EmptyDatabase()
         {
             context.Database.ExecuteSqlCommand("DELETE FROM [ItemTagMaps]");
