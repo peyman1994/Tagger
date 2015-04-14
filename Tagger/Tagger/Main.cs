@@ -36,6 +36,8 @@ namespace TaggerNamespace
             var tags = context.Tags.ToArray();
             newTag.Items.AddRange(tags);
             tagSelector.Items.AddRange(tags);
+            GenerateTopTags(tags);
+            //tags.GroupBy(t => t.Items)
         }
 
         private void tagButton_Click(object sender, EventArgs e)
@@ -56,6 +58,7 @@ namespace TaggerNamespace
                 context.Tags.Add(tag);
                 context.SaveChanges();
                 newTag.Items.Add(tag);
+                tagSelector.Items.Add(tag);
             }
 
             TagSelected(tag);
@@ -116,6 +119,10 @@ namespace TaggerNamespace
         {
             searchQuery.Text += tagSelector.Text;
         }
+        private void topTag_Click(object sender, EventArgs e)
+        {
+            searchQuery.Text += ((Label)sender).Text;
+        }
         private void tagSelector_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -165,6 +172,18 @@ namespace TaggerNamespace
                 });
             }
             context.SaveChanges();
+        }
+
+        private void GenerateTopTags(Tag[] tags)
+        {
+            var tagList = tags.OrderBy(t => t.Name).ToList();
+            var counts = tagList.Select(t => t.Items.Count());
+            var min = counts.Min();
+            var range = counts.Max() - min;
+            foreach(var tag in tagList)
+            {
+                topTags.Controls.Add(GetTopTagLabel(tag, range, min));
+            }
         }
 
         /// <summary>
@@ -288,6 +307,14 @@ namespace TaggerNamespace
             var recentTagLabel = GetTagLabel(tag);
             recentTagLabel.MouseClick += new MouseEventHandler(recentTag_Click);
             return recentTagLabel;
+        }
+
+        private Label GetTopTagLabel(Tag tag, int range, int min)
+        {
+            var topTagLabel = GetTagLabel(tag);
+            topTagLabel.Font = new Font(FontFamily.GenericSansSerif, 10 + 5*((tag.Items.Count() - min)/range));
+            topTagLabel.MouseClick += new MouseEventHandler(topTag_Click);
+            return topTagLabel;
         }
         #endregion
     }
