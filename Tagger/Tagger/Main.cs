@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using TaggerNamespace.DAL;
 using TaggerNamespace.Model;
-using System.Data.Entity;
 using System.Diagnostics;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace TaggerNamespace
 {
@@ -29,15 +26,14 @@ namespace TaggerNamespace
         #region Events
         private void Main_Load(object sender, EventArgs e)
         {
-            //EmptyDatabase();
-            //SaveFolder(new DirectoryInfo(@"C:\Users\Peyman\Documents\Git\TestFiles"), null);
+            EmptyDatabase();
+            SaveFolder(new DirectoryInfo(@"C:\Users\Peyman\Documents\Git\TestFiles"), null);
 
             treeView.Nodes.Add(LoadTree(context.Items.Where(i => i.ParentId == null).SingleOrDefault()));
             var tags = context.Tags.ToArray();
             newTag.Items.AddRange(tags);
             tagSelector.Items.AddRange(tags);
             GenerateTopTags(tags);
-            //tags.GroupBy(t => t.Items)
         }
 
         private void tagButton_Click(object sender, EventArgs e)
@@ -155,21 +151,41 @@ namespace TaggerNamespace
                 Name = directoryInfo.Name,
                 Path = directoryInfo.FullName,
                 ParentId = parentId,
-                IsFolder = true
             };
             context.Items.Add(folder);
             context.SaveChanges();
+
             foreach (var directory in directoryInfo.GetDirectories())
                 SaveFolder(directory, folder.Id);
             foreach (var file in directoryInfo.GetFiles())
             {
-                context.Items.Add(new Item()
+                var item = new Item()
                 {
-                    IsFolder = false,
                     Name = file.Name,
                     Path = file.FullName,
                     ParentId = folder.Id
-                });
+                };
+
+                if (file.Name.Contains(" [Tags] "))
+                {
+                    var tagSplit = file.Name.Split(new string[] { " [Tags] " }, StringSplitOptions.None);
+                    item.Name = tagSplit.First().Trim();
+                    var tags = tagSplit.Last().Split('.').First().Split(' ');
+
+                    foreach (var tag in tags)
+                    {
+                        if (string.IsNullOrEmpty(tag)) continue;
+                        var tagToAdd = context.Tags.Where(t => t.Name == tag).SingleOrDefault();
+                        if (tagToAdd == null)
+                        {
+                            tagToAdd = new Tag() { Name = tag };
+                            context.Tags.Add(tagToAdd);
+                            context.SaveChanges();
+                        }
+                        item.Tags.Add(tagToAdd);
+                    }
+                }
+                context.Items.Add(item);
             }
             context.SaveChanges();
         }
@@ -178,9 +194,10 @@ namespace TaggerNamespace
         {
             var tagList = tags.OrderBy(t => t.Name).ToList();
             var counts = tagList.Select(t => t.Items.Count());
+            if (counts == null || !counts.Any()) return;
             var min = counts.Min();
             var range = counts.Max() - min;
-            foreach(var tag in tagList)
+            foreach (var tag in tagList)
             {
                 topTags.Controls.Add(GetTopTagLabel(tag, range, min));
             }
@@ -209,10 +226,28 @@ namespace TaggerNamespace
                 if (item != null)
                 {
                     item.Tags.Add(tag);
+                    item.Path = TagFileName(item.Path, tag.Name);
                     context.Items.Attach(item);
                 }
             }
             context.SaveChanges();
+        }
+
+        private string TagFileName(string path, string tag)
+        {
+            string newPath = path.Replace(Path.GetFileName(path), GetTaggedName(path, tag));
+            File.Move(path, newPath);
+            return newPath;
+        }
+
+        private string GetTaggedName(string path, string tag)
+        {
+            string name = Path.GetFileNameWithoutExtension(path);
+            if (name.Contains("[Tags]"))
+                name += " " + tag;
+            else
+                name += " [Tags] " + tag;
+            return name + Path.GetExtension(path);
         }
 
         /// <summary>
@@ -312,7 +347,10 @@ namespace TaggerNamespace
         private Label GetTopTagLabel(Tag tag, int range, int min)
         {
             var topTagLabel = GetTagLabel(tag);
-            topTagLabel.Font = new Font(FontFamily.GenericSansSerif, 10 + 5*((tag.Items.Count() - min)/range));
+            int offset = 0;
+            if (range > 0)
+                offset = 5 * ((tag.Items.Count() - min) / range);
+            topTagLabel.Font = new Font(FontFamily.GenericSansSerif, 10 + offset);
             topTagLabel.MouseClick += new MouseEventHandler(topTag_Click);
             return topTagLabel;
         }

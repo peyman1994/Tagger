@@ -94,6 +94,7 @@
             this.newTag.Size = new System.Drawing.Size(196, 21);
             this.newTag.TabIndex = 7;
             this.newTag.ValueMember = "Id";
+            this.newTag.DisplayMember = "Name";
             this.newTag.KeyDown += new System.Windows.Forms.KeyEventHandler(this.newTag_KeyDown);
             // 
             // recentTags

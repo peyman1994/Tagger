@@ -10,19 +10,29 @@ namespace TaggerNamespace.Model
 {
     public class Item
     {
+        public Item()
+        {
+            Tags = new List<Tag>();
+        }
+
         [Key]
         public int Id { get; set; }
         [Required]
         public String Path { get; set; }
         public String Name { get; set; }
         public int? ParentId { get; set; }
-        public bool IsFolder { get; set; }
+        public string Hash { get; set; }
 
         public virtual IList<Tag> Tags { get; set; }
     }
 
     public class Tag
     {
+        public Tag()
+        {
+            Items = new List<Item>();
+        }
+
         [Key]
         public int Id { get; set; }
         [Required]
