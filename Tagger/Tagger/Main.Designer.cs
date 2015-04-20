@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Tagger));
             this.tagButton = new System.Windows.Forms.Button();
             this.tagContainer = new System.Windows.Forms.FlowLayoutPanel();
@@ -39,12 +40,17 @@
             this.tagTab = new System.Windows.Forms.TabPage();
             this.searchTab = new System.Windows.Forms.TabPage();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.searchResults = new System.Windows.Forms.ListView();
+            this.topTags = new System.Windows.Forms.FlowLayoutPanel();
             this.appendTag = new System.Windows.Forms.Button();
             this.searchQuery = new System.Windows.Forms.TextBox();
             this.tagSelector = new System.Windows.Forms.ComboBox();
-            this.searchResults = new System.Windows.Forms.ListView();
             this.searchButton = new System.Windows.Forms.Button();
-            this.topTags = new System.Windows.Forms.FlowLayoutPanel();
+            this.mainMenu1 = new System.Windows.Forms.MainMenu(this.components);
+            this.menuItem1 = new System.Windows.Forms.MenuItem();
+            this.menuItem2 = new System.Windows.Forms.MenuItem();
+            this.menuItem3 = new System.Windows.Forms.MenuItem();
+            this.menuItem4 = new System.Windows.Forms.MenuItem();
             this.treeView = new TaggerNamespace.MultiSelectTreeview();
             this.tabControl1.SuspendLayout();
             this.tagTab.SuspendLayout();
@@ -57,11 +63,8 @@
             // 
             // tagButton
             // 
-            this.tagButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.tagButton.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.tagButton.Location = new System.Drawing.Point(665, 11);
+            this.tagButton.Location = new System.Drawing.Point(662, 11);
             this.tagButton.Name = "tagButton";
             this.tagButton.Size = new System.Drawing.Size(36, 21);
             this.tagButton.TabIndex = 4;
@@ -75,10 +78,10 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tagContainer.BackColor = System.Drawing.SystemColors.Window;
             this.tagContainer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.tagContainer.Location = new System.Drawing.Point(460, 308);
+            this.tagContainer.Location = new System.Drawing.Point(460, 259);
             this.tagContainer.Name = "tagContainer";
             this.tagContainer.Padding = new System.Windows.Forms.Padding(5);
-            this.tagContainer.Size = new System.Drawing.Size(241, 173);
+            this.tagContainer.Size = new System.Drawing.Size(241, 161);
             this.tagContainer.TabIndex = 6;
             // 
             // newTag
@@ -88,13 +91,13 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.newTag.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this.newTag.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.newTag.DisplayMember = "Name";
             this.newTag.FormattingEnabled = true;
             this.newTag.Location = new System.Drawing.Point(460, 11);
             this.newTag.Name = "newTag";
             this.newTag.Size = new System.Drawing.Size(196, 21);
             this.newTag.TabIndex = 7;
             this.newTag.ValueMember = "Id";
-            this.newTag.DisplayMember = "Name";
             this.newTag.KeyDown += new System.Windows.Forms.KeyEventHandler(this.newTag_KeyDown);
             // 
             // recentTags
@@ -103,17 +106,17 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.recentTags.BackColor = System.Drawing.SystemColors.Window;
             this.recentTags.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.recentTags.Location = new System.Drawing.Point(460, 61);
+            this.recentTags.Location = new System.Drawing.Point(460, 55);
             this.recentTags.Name = "recentTags";
             this.recentTags.Padding = new System.Windows.Forms.Padding(5);
-            this.recentTags.Size = new System.Drawing.Size(241, 218);
+            this.recentTags.Size = new System.Drawing.Size(241, 175);
             this.recentTags.TabIndex = 8;
             // 
             // recentTagsLabel
             // 
             this.recentTagsLabel.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.recentTagsLabel.AutoSize = true;
-            this.recentTagsLabel.Location = new System.Drawing.Point(457, 45);
+            this.recentTagsLabel.Location = new System.Drawing.Point(457, 39);
             this.recentTagsLabel.Name = "recentTagsLabel";
             this.recentTagsLabel.Size = new System.Drawing.Size(69, 13);
             this.recentTagsLabel.TabIndex = 9;
@@ -123,7 +126,7 @@
             // 
             this.tagContainerLabel.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.tagContainerLabel.AutoSize = true;
-            this.tagContainerLabel.Location = new System.Drawing.Point(460, 292);
+            this.tagContainerLabel.Location = new System.Drawing.Point(457, 243);
             this.tagContainerLabel.Name = "tagContainerLabel";
             this.tagContainerLabel.Size = new System.Drawing.Size(76, 13);
             this.tagContainerLabel.TabIndex = 10;
@@ -137,7 +140,7 @@
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(715, 513);
+            this.tabControl1.Size = new System.Drawing.Size(715, 452);
             this.tabControl1.TabIndex = 11;
             // 
             // tagTab
@@ -153,7 +156,7 @@
             this.tagTab.Location = new System.Drawing.Point(4, 22);
             this.tagTab.Name = "tagTab";
             this.tagTab.Padding = new System.Windows.Forms.Padding(3);
-            this.tagTab.Size = new System.Drawing.Size(707, 487);
+            this.tagTab.Size = new System.Drawing.Size(707, 426);
             this.tagTab.TabIndex = 0;
             this.tagTab.Text = "Tag";
             // 
@@ -168,7 +171,7 @@
             this.searchTab.Location = new System.Drawing.Point(4, 22);
             this.searchTab.Name = "searchTab";
             this.searchTab.Padding = new System.Windows.Forms.Padding(3);
-            this.searchTab.Size = new System.Drawing.Size(707, 487);
+            this.searchTab.Size = new System.Drawing.Size(707, 447);
             this.searchTab.TabIndex = 1;
             this.searchTab.Text = "Search";
             // 
@@ -185,9 +188,34 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.topTags);
-            this.splitContainer1.Size = new System.Drawing.Size(695, 447);
-            this.splitContainer1.SplitterDistance = 242;
+            this.splitContainer1.Size = new System.Drawing.Size(695, 468);
+            this.splitContainer1.SplitterDistance = 253;
             this.splitContainer1.TabIndex = 6;
+            // 
+            // searchResults
+            // 
+            this.searchResults.AllowColumnReorder = true;
+            this.searchResults.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.searchResults.FullRowSelect = true;
+            this.searchResults.Location = new System.Drawing.Point(0, 0);
+            this.searchResults.Name = "searchResults";
+            this.searchResults.Size = new System.Drawing.Size(695, 253);
+            this.searchResults.Sorting = System.Windows.Forms.SortOrder.Ascending;
+            this.searchResults.TabIndex = 2;
+            this.searchResults.UseCompatibleStateImageBehavior = false;
+            this.searchResults.View = System.Windows.Forms.View.Details;
+            this.searchResults.DoubleClick += new System.EventHandler(this.searchResults_DoubleClick);
+            // 
+            // topTags
+            // 
+            this.topTags.BackColor = System.Drawing.SystemColors.Window;
+            this.topTags.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.topTags.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.topTags.Location = new System.Drawing.Point(0, 0);
+            this.topTags.Name = "topTags";
+            this.topTags.Padding = new System.Windows.Forms.Padding(5);
+            this.topTags.Size = new System.Drawing.Size(695, 211);
+            this.topTags.TabIndex = 0;
             // 
             // appendTag
             // 
@@ -220,23 +248,6 @@
             this.tagSelector.ValueMember = "Id";
             this.tagSelector.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tagSelector_KeyDown);
             // 
-            // searchResults
-            // 
-            this.searchResults.AllowColumnReorder = true;
-            this.searchResults.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.searchResults.FullRowSelect = true;
-            this.searchResults.Location = new System.Drawing.Point(0, 0);
-            this.searchResults.Name = "searchResults";
-            this.searchResults.Size = new System.Drawing.Size(695, 242);
-            this.searchResults.Sorting = System.Windows.Forms.SortOrder.Ascending;
-            this.searchResults.TabIndex = 2;
-            this.searchResults.UseCompatibleStateImageBehavior = false;
-            this.searchResults.View = System.Windows.Forms.View.Details;
-            this.searchResults.DoubleClick += new System.EventHandler(this.searchResults_DoubleClick);
-            this.searchResults.Columns.Add("Name", 100);
-            this.searchResults.Columns.Add("Path", 200);
-            this.searchResults.Columns.Add("Tags", 250);
-            // 
             // searchButton
             // 
             this.searchButton.Location = new System.Drawing.Point(638, 7);
@@ -247,16 +258,34 @@
             this.searchButton.UseVisualStyleBackColor = true;
             this.searchButton.Click += new System.EventHandler(this.searchButton_Click);
             // 
-            // topTags
+            // mainMenu1
             // 
-            this.topTags.BackColor = System.Drawing.SystemColors.Window;
-            this.topTags.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.topTags.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.topTags.Location = new System.Drawing.Point(0, 0);
-            this.topTags.Name = "topTags";
-            this.topTags.Padding = new System.Windows.Forms.Padding(5);
-            this.topTags.Size = new System.Drawing.Size(695, 201);
-            this.topTags.TabIndex = 0;
+            this.mainMenu1.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.menuItem1});
+            // 
+            // menuItem1
+            // 
+            this.menuItem1.Index = 0;
+            this.menuItem1.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.menuItem2,
+            this.menuItem3,
+            this.menuItem4});
+            this.menuItem1.Text = "File";
+            // 
+            // menuItem2
+            // 
+            this.menuItem2.Index = 0;
+            this.menuItem2.Text = "About";
+            // 
+            // menuItem3
+            // 
+            this.menuItem3.Index = 1;
+            this.menuItem3.Text = "Settings";
+            // 
+            // menuItem4
+            // 
+            this.menuItem4.Index = 2;
+            this.menuItem4.Text = "Exit";
             // 
             // treeView
             // 
@@ -266,7 +295,7 @@
             this.treeView.Location = new System.Drawing.Point(6, 6);
             this.treeView.Name = "treeView";
             this.treeView.SelectedNodes = ((System.Collections.Generic.List<System.Windows.Forms.TreeNode>)(resources.GetObject("treeView.SelectedNodes")));
-            this.treeView.Size = new System.Drawing.Size(448, 475);
+            this.treeView.Size = new System.Drawing.Size(448, 414);
             this.treeView.TabIndex = 5;
             this.treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView_AfterSelect);
             this.treeView.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView_DoubleClick);
@@ -275,8 +304,9 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(715, 513);
+            this.ClientSize = new System.Drawing.Size(715, 452);
             this.Controls.Add(this.tabControl1);
+            this.Menu = this.mainMenu1;
             this.Name = "Tagger";
             this.Text = "Tagger";
             this.Load += new System.EventHandler(this.Main_Load);
@@ -301,7 +331,6 @@
         #endregion
 
         private System.Windows.Forms.Button tagButton;
-        private global::TaggerNamespace.MultiSelectTreeview treeView;
         private System.Windows.Forms.FlowLayoutPanel tagContainer;
         private System.Windows.Forms.ComboBox newTag;
         private System.Windows.Forms.FlowLayoutPanel recentTags;
@@ -317,6 +346,12 @@
         private System.Windows.Forms.Button appendTag;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.FlowLayoutPanel topTags;
+        private MultiSelectTreeview treeView;
+        private System.Windows.Forms.MainMenu mainMenu1;
+        private System.Windows.Forms.MenuItem menuItem1;
+        private System.Windows.Forms.MenuItem menuItem2;
+        private System.Windows.Forms.MenuItem menuItem3;
+        private System.Windows.Forms.MenuItem menuItem4;
     }
 }
 

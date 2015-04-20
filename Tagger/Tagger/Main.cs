@@ -10,6 +10,7 @@ using TaggerNamespace.Model;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Configuration;
 
 namespace TaggerNamespace
 {
@@ -26,6 +27,7 @@ namespace TaggerNamespace
         #region Events
         private void Main_Load(object sender, EventArgs e)
         {
+            Init();
             EmptyDatabase();
             SaveFolder(new DirectoryInfo(@"C:\Users\Peyman\Documents\Git\TestFiles"), null);
 
@@ -34,6 +36,19 @@ namespace TaggerNamespace
             newTag.Items.AddRange(tags);
             tagSelector.Items.AddRange(tags);
             GenerateTopTags(tags);
+        }
+
+        private void Init()
+        {
+            var settings = ConfigurationManager.AppSettings;
+            if (!settings.AllKeys.Contains("CurrentRoot"))
+            {
+                var msg = MessageBox.Show("Please pick a root directory in the settings menu.");
+                
+                var settingForm = new Settings(context);
+                settingForm.ShowDialog(this);
+                var t = "test";
+            }
         }
 
         private void tagButton_Click(object sender, EventArgs e)
