@@ -38,6 +38,7 @@
             this.tagContainerLabel = new System.Windows.Forms.Label();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tagTab = new System.Windows.Forms.TabPage();
+            this.treeView = new TaggerNamespace.MultiSelectTreeview();
             this.searchTab = new System.Windows.Forms.TabPage();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.searchResults = new System.Windows.Forms.ListView();
@@ -51,7 +52,6 @@
             this.menuItem2 = new System.Windows.Forms.MenuItem();
             this.menuItem3 = new System.Windows.Forms.MenuItem();
             this.menuItem4 = new System.Windows.Forms.MenuItem();
-            this.treeView = new TaggerNamespace.MultiSelectTreeview();
             this.tabControl1.SuspendLayout();
             this.tagTab.SuspendLayout();
             this.searchTab.SuspendLayout();
@@ -160,6 +160,19 @@
             this.tagTab.TabIndex = 0;
             this.tagTab.Text = "Tag";
             // 
+            // treeView
+            // 
+            this.treeView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.treeView.Location = new System.Drawing.Point(6, 6);
+            this.treeView.Name = "treeView";
+            this.treeView.SelectedNodes = ((System.Collections.Generic.List<System.Windows.Forms.TreeNode>)(resources.GetObject("treeView.SelectedNodes")));
+            this.treeView.Size = new System.Drawing.Size(448, 414);
+            this.treeView.TabIndex = 5;
+            this.treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView_AfterSelect);
+            this.treeView.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView_DoubleClick);
+            // 
             // searchTab
             // 
             this.searchTab.BackColor = System.Drawing.SystemColors.Control;
@@ -171,7 +184,7 @@
             this.searchTab.Location = new System.Drawing.Point(4, 22);
             this.searchTab.Name = "searchTab";
             this.searchTab.Padding = new System.Windows.Forms.Padding(3);
-            this.searchTab.Size = new System.Drawing.Size(707, 447);
+            this.searchTab.Size = new System.Drawing.Size(707, 426);
             this.searchTab.TabIndex = 1;
             this.searchTab.Text = "Search";
             // 
@@ -205,6 +218,9 @@
             this.searchResults.UseCompatibleStateImageBehavior = false;
             this.searchResults.View = System.Windows.Forms.View.Details;
             this.searchResults.DoubleClick += new System.EventHandler(this.searchResults_DoubleClick);
+            this.searchResults.Columns.Add("Name", 100);
+            this.searchResults.Columns.Add("Path", 200);
+            this.searchResults.Columns.Add("Tags", 250);
             // 
             // topTags
             // 
@@ -281,24 +297,12 @@
             // 
             this.menuItem3.Index = 1;
             this.menuItem3.Text = "Settings";
+            this.menuItem3.Click += new System.EventHandler(this.menuItem3_Click);
             // 
             // menuItem4
             // 
             this.menuItem4.Index = 2;
             this.menuItem4.Text = "Exit";
-            // 
-            // treeView
-            // 
-            this.treeView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.treeView.Location = new System.Drawing.Point(6, 6);
-            this.treeView.Name = "treeView";
-            this.treeView.SelectedNodes = ((System.Collections.Generic.List<System.Windows.Forms.TreeNode>)(resources.GetObject("treeView.SelectedNodes")));
-            this.treeView.Size = new System.Drawing.Size(448, 414);
-            this.treeView.TabIndex = 5;
-            this.treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView_AfterSelect);
-            this.treeView.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView_DoubleClick);
             // 
             // Tagger
             // 

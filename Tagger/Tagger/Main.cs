@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Configuration;
+using TaggerNamespace.Properties;
 
 namespace TaggerNamespace
 {
@@ -27,11 +28,9 @@ namespace TaggerNamespace
         #region Events
         private void Main_Load(object sender, EventArgs e)
         {
+            //EmptyDatabase();
             Init();
-            EmptyDatabase();
-            SaveFolder(new DirectoryInfo(@"C:\Users\Peyman\Documents\Git\TestFiles"), null);
 
-            treeView.Nodes.Add(LoadTree(context.Items.Where(i => i.ParentId == null).SingleOrDefault()));
             var tags = context.Tags.ToArray();
             newTag.Items.AddRange(tags);
             tagSelector.Items.AddRange(tags);
@@ -40,15 +39,14 @@ namespace TaggerNamespace
 
         private void Init()
         {
-            var settings = ConfigurationManager.AppSettings;
-            if (!settings.AllKeys.Contains("CurrentRoot"))
+            while (Settings.Default.DefaultDb == 0)
             {
                 var msg = MessageBox.Show("Please pick a root directory in the settings menu.");
                 
-                var settingForm = new Settings(context);
+                var settingForm = new Preferences(context);
                 settingForm.ShowDialog(this);
-                var t = "test";
             }
+            InitTree(Settings.Default.DefaultDb);
         }
 
         private void tagButton_Click(object sender, EventArgs e)
@@ -139,6 +137,12 @@ namespace TaggerNamespace
             if (e.KeyCode == Keys.Enter)
                 appendTag_Click(sender, e);
         }
+        
+        private void menuItem3_Click(object sender, EventArgs e)
+        {
+            var settings = new Preferences(context);
+            settings.ShowDialog(this);
+        }
         #endregion
 
         #region Helper Methods
@@ -149,60 +153,20 @@ namespace TaggerNamespace
             context.Database.ExecuteSqlCommand("DELETE FROM [Tags]");
         }
 
-        public TreeNode LoadTree(Item item)
+        private void InitTree(int rootId)
+        {
+            var root = context.Items.Where(i => i.Id == rootId).SingleOrDefault();
+            treeView.Nodes.Add(LoadTreeNode(root));
+        }
+
+        public TreeNode LoadTreeNode(Item item)
         {
             var children = context.Items.Where(i => i.ParentId == item.Id).ToList();
             var directoryNode = new TreeNode(item.Name);
             directoryNode.Name = item.Id.ToString();
             foreach (var child in children)
-                directoryNode.Nodes.Add(LoadTree(child));
+                directoryNode.Nodes.Add(LoadTreeNode(child));
             return directoryNode;
-        }
-
-        private void SaveFolder(DirectoryInfo directoryInfo, int? parentId)
-        {
-            var folder = new Item()
-            {
-                Name = directoryInfo.Name,
-                Path = directoryInfo.FullName,
-                ParentId = parentId,
-            };
-            context.Items.Add(folder);
-            context.SaveChanges();
-
-            foreach (var directory in directoryInfo.GetDirectories())
-                SaveFolder(directory, folder.Id);
-            foreach (var file in directoryInfo.GetFiles())
-            {
-                var item = new Item()
-                {
-                    Name = file.Name,
-                    Path = file.FullName,
-                    ParentId = folder.Id
-                };
-
-                if (file.Name.Contains(" [Tags] "))
-                {
-                    var tagSplit = file.Name.Split(new string[] { " [Tags] " }, StringSplitOptions.None);
-                    item.Name = tagSplit.First().Trim();
-                    var tags = tagSplit.Last().Split('.').First().Split(' ');
-
-                    foreach (var tag in tags)
-                    {
-                        if (string.IsNullOrEmpty(tag)) continue;
-                        var tagToAdd = context.Tags.Where(t => t.Name == tag).SingleOrDefault();
-                        if (tagToAdd == null)
-                        {
-                            tagToAdd = new Tag() { Name = tag };
-                            context.Tags.Add(tagToAdd);
-                            context.SaveChanges();
-                        }
-                        item.Tags.Add(tagToAdd);
-                    }
-                }
-                context.Items.Add(item);
-            }
-            context.SaveChanges();
         }
 
         private void GenerateTopTags(Tag[] tags)
